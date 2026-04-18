@@ -64,3 +64,7 @@ Located in `rosetta-video/`. Uses Puppeteer for visual capture and FFmpeg for au
 ## Environment Variables
 
 `.env`: `GEMINI_API_KEY`, `TTS_ENGINE` (edge/gemini), `PORT` (10010), `EDGE_TTS_PYTHON` (.venv-edge-tts/bin/python)
+
+## Commit Identity
+
+When Claude commits changes in this repository, it may use Claude's configured git identity directly. There is no requirement to rewrite commits to match the local user's name or email before pushing.
