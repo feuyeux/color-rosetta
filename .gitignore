@@ -1,0 +1,12 @@
+node_modules/
+.venv-edge-tts/
+.env
+.DS_Store
+*.log
+npm-debug.log*
+package-lock.json
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
