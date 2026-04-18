@@ -64,7 +64,15 @@ The TTS smoke test may report `HIT` on the first visible run if `.cache/` alread
 
 ## Commit & Pull Request Guidelines
 History is minimal, but the existing commit uses a short, descriptive subject (`Initial commit: ...`). Follow that pattern: concise, imperative, and specific to the change. PRs should include a summary, any `.env` or runtime prerequisites, linked issues if applicable, and screenshots or short recordings for UI changes.
-When committing from an AI agent workflow, Codex/Claude/Gemini may use their own configured git identity. Do not block on switching the commit author to match the local user.
+
+For AI-agent commits in this repository, use the following identities:
+
+| Committing Tool | Author | Co-authored-by |
+| :-------------- | :----- | :------------- |
+| Claude | `Claude <noreply@anthropic.com>` | `Co-authored-by: Claude <noreply@anthropic.com>` |
+| Codex | `Codex <noreply@openai.com>` | `Co-authored-by: Codex <noreply@openai.com>` |
+| Gemini | `Gemini <noreply@google.com>` | `Co-authored-by: Gemini <noreply@google.com>` |
+| OpenCode | `OpenCode <opencode@ai.local>` | `Co-authored-by: OpenCode <opencode@ai.local>` |
 
 ## Security & Configuration Tips
 Keep secrets in `.env`; never commit API keys. The main runtime variables are `PORT`, `TTS_ENGINE`, `GEMINI_API_KEY`, and optionally `EDGE_TTS_PYTHON`. If you change cache behavior, static file layout, or Python runtime settings, document the required env vars and operational impact in `README.md` and preserve the default `.venv-edge-tts` path unless there is a strong reason to change it.

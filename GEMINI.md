@@ -51,4 +51,11 @@ npm run pre-cache
 
 ## Commit Identity
 
-When Gemini commits changes in this repository, it may use Gemini's configured git identity directly. There is no requirement to rewrite commits to match the local user's name or email before pushing.
+Use the following AI commit identities in this repository:
+
+| Committing Tool | Author | Co-authored-by |
+| :-------------- | :----- | :------------- |
+| Claude | `Claude <noreply@anthropic.com>` | `Co-authored-by: Claude <noreply@anthropic.com>` |
+| Codex | `Codex <noreply@openai.com>` | `Co-authored-by: Codex <noreply@openai.com>` |
+| Gemini | `Gemini <noreply@google.com>` | `Co-authored-by: Gemini <noreply@google.com>` |
+| OpenCode | `OpenCode <opencode@ai.local>` | `Co-authored-by: OpenCode <opencode@ai.local>` |

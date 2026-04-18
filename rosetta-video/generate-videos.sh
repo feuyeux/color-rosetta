@@ -31,7 +31,7 @@ echo ""
 echo "🎥 Starting video generation..."
 echo ""
 
-node scripts/generate-videos-with-audio.js
+node rosetta-video/generate-videos-with-audio.js
 
 EXIT_CODE=$?
 

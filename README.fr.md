@@ -2,48 +2,15 @@
 
 Roue chromatique interactive de 24 teintes. Cliquez sur les couleurs pour entendre les prononciations en 10 langues. Prend en charge Gemini / Edge-TTS.
 
-<img src="docs/assets/color-rosetta.png" alt="Capture d'écran Color Rosetta" width="500" style="float:left;margin-right:24px;margin-bottom:16px;" />
 
 ## Fonctionnalités
 
 - 24 segments de couleur en rosette (SVG)
-- 10 langues : chinois, anglais, français, espagnol, russe, grec, hindi, arabe, japonais, coréen
+- 10 langues : 🇨🇳 chinois, 🇬🇧 anglais, 🇫🇷 français, 🇪🇸 espagnol, 🇷🇺 russe, 🇬🇷 grec, 🇮🇳 hindi, 🇸🇦 arabe, 🇯🇵 japonais, 🇰🇷 coréen
 - Double moteur TTS : Google Gemini TTS & Microsoft Edge-TTS
 - Cache audio haché MD5 avec repli automatique via proxy
 - Accessibilité clavier (Tab + Entrée/Espace)
 - Support RTL pour l'arabe
-
-## Démonstrations vidéo
-
-**🇨🇳 中文**
-<video src="rosetta-video/output/color-wheel-zh-chinese.mp4" controls width="320"></video>
-
-**🇬🇧 English**
-<video src="rosetta-video/output/color-wheel-en-english.mp4" controls width="320"></video>
-
-**🇫🇷 Français**
-<video src="rosetta-video/output/color-wheel-fr-french.mp4" controls width="320"></video>
-
-**🇪🇸 Español**
-<video src="rosetta-video/output/color-wheel-es-spanish.mp4" controls width="320"></video>
-
-**🇷🇺 Русский**
-<video src="rosetta-video/output/color-wheel-ru-russian.mp4" controls width="320"></video>
-
-**🇬🇷 Ελληνικά**
-<video src="rosetta-video/output/color-wheel-el-greek.mp4" controls width="320"></video>
-
-**🇮🇳 हिन्दी**
-<video src="rosetta-video/output/color-wheel-hi-hindi.mp4" controls width="320"></video>
-
-**🇸🇦 العربية**
-<video src="rosetta-video/output/color-wheel-ar-arabic.mp4" controls width="320"></video>
-
-**🇯🇵 日本語**
-<video src="rosetta-video/output/color-wheel-ja-japanese.mp4" controls width="320"></video>
-
-**🇰🇷 한국어**
-<video src="rosetta-video/output/color-wheel-ko-korean.mp4" controls width="320"></video>
 
 ## Démarrage rapide
 
@@ -76,3 +43,7 @@ BASE_URL=http://localhost:3100 npm run test:tts  # Port personnalisé
 ## Traductions
 
 [English](README.md) · [中文](README.zh.md) · [Español](README.es.md) · [Русский](README.ru.md) · [Ελληνικά](README.el.md) · [हिन्दी](README.hi.md) · [العربية](README.ar.md) · [日本語](README.ja.md) · [한국어](README.ko.md)
+
+## Historique des Stars
+
+[![Star History Chart](https://api.star-history.com/svg?repos=feuyeux/color-rosetta&type=Date)](https://star-history.com/#feuyeux/color-rosetta&Date)
