@@ -1,11 +1,11 @@
 # Color Rosetta
 
-交互式 24 色相环，点击颜色即可听取 10 种语言的发音。支持 Gemini / Edge-TTS 双引擎。
+交互式 24 色轮，点击任意色块即可听取 10 种语言的发音。支持 Gemini / Edge-TTS 双引擎。
 
 
 ## 特性
 
-- 24 色尖刺罗塞塔圆盘（SVG）
+- 24 色尖刺 SVG 色轮
 - 10 种语言：🇨🇳 中文、🇬🇧 英语、🇫🇷 法语、🇪🇸 西班牙语、🇷🇺 俄语、🇬🇷 希腊语、🇮🇳 印地语、🇸🇦 阿拉伯语、🇯🇵 日语、🇰🇷 韩语
 - 双 TTS 引擎：Google Gemini TTS & Microsoft Edge-TTS
 - MD5 哈希音频缓存，自动代理回退
@@ -39,6 +39,12 @@ npm run test:tts         # 烟雾测试全部 10 种语言
 npm run pre-cache        # 预缓存全部 TTS 音频（edge 引擎）
 BASE_URL=http://localhost:3100 npm run test:tts  # 自定义端口
 ```
+
+## 文档
+
+- [文化解读：Color Rosetta](docs/color-rosetta.md)
+- [架构流程](docs/ARCH_FLOW.md)
+- [视频生成指南](rosetta-video/README.md)
 
 ## 翻译
 

@@ -1,72 +1,59 @@
 # Rosetta Video Generator
 
-自动生成色轮演示视频的工具集。
+`rosetta-video/` contains the canonical tooling for generating demo videos from the main `Color Rosetta` app.
 
-## 功能
+## What it produces
 
-为10种语言各生成一个独立的演示视频：
-- 中文 (zh)、英语 (en)、法语 (fr)、西班牙语 (es)、俄语 (ru)
-- 希腊语 (el)、印地语 (hi)、阿拉伯语 (ar)、日语 (ja)、韩语 (ko)
+- One final MP4 per language for all 10 supported languages
+- Each video clicks through the full 24-color wheel clockwise
+- Audio is merged from the cached Edge-TTS files
+- Final output is written to the repository-level `output/` directory
 
-每个视频：
-- 时长约1分钟
-- 按顺时针顺序点击24个颜色
-- 包含同步的TTS音频
-- 分辨率 1920x1080 (Full HD)
+## Canonical entrypoints
 
-## 使用方法
+- `./rosetta-video/generate-videos.sh`
+- `node rosetta-video/generate-videos-with-audio.js`
 
-### 快速开始
+The shell wrapper starts the app server if needed, then runs the generator.
+
+## Usage
+
+From the repository root:
 
 ```bash
-cd /Users/han/coding/color-rosetta/rosetta-video
-./generate-videos.sh
+./rosetta-video/generate-videos.sh
 ```
 
-### 手动运行
+Or run the generator directly after starting the server:
 
 ```bash
-# 1. 确保主服务器运行
-cd /Users/han/coding/color-rosetta
-npm start &
-
-# 2. 生成视频
-cd rosetta-video
-node generate-videos-with-audio.js
-
-# 3. 查看输出
+npm start
+node rosetta-video/generate-videos-with-audio.js
 ls -lh output/
 ```
 
-## 输出文件
+To render only specific languages:
 
-每种语言生成3个文件：
-- `color-wheel-{lang}-{name}-silent.mp4` - 无声视频
-- `color-wheel-{lang}-{name}-audio.mp3` - 合并的音频轨道
-- `color-wheel-{lang}-{name}.mp4` - **最终视频（带音频）**
+```bash
+node rosetta-video/generate-videos-with-audio.js zh,en
+```
 
-## 技术实现
+## Output files
 
-1. **音频合并**：从 `../.cache/` 读取24个TTS音频文件，用FFmpeg concat合并
-2. **视频录制**：Puppeteer自动控制浏览器，录制色轮点击过程
-3. **音视频合成**：FFmpeg将视频和音频流合并
+The generator writes:
 
-## 依赖
+- `output/color-wheel-{lang}-{name}.mp4` for each requested language
+- Temporary `-silent.mp4` and `-audio.mp3` files during generation, then removes them on success
+
+## Dependencies
 
 - Node.js + npm
-- Puppeteer (已安装)
-- puppeteer-screen-recorder (已安装)
-- FFmpeg (系统需安装)
+- FFmpeg and FFprobe on `PATH`
+- The main app available at `http://localhost:10010`
+- Pre-cached Edge-TTS audio in `.cache/`
 
-## 时间估算
+## Notes
 
-- 单个视频：约1分钟
-- 全部10个视频：10-15分钟
-
-## 文件说明
-
-- `generate-videos-with-audio.js` - 主生成脚本
-- `generate-videos.sh` - 一键启动脚本
-- `test-video.sh` - 快速测试脚本（仅生成中文）
-- `VIDEO_GENERATION.md` - 详细文档
-- `output/` - 视频输出目录
+- The generator uses `public/assets/js/data.js` as the canonical 24-color dataset.
+- If any cached audio is missing, generation stops with a clear error naming the missing file.
+- Legacy experimental scripts were removed to keep this directory aligned with the current workflow.

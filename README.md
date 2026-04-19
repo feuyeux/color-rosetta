@@ -1,10 +1,10 @@
 # Color Rosetta
 
-Interactive 24-hue color wheel with multilingual TTS. Click any color segment to hear its name pronounced in 10 languages via Gemini or Edge-TTS.
+Interactive 24-color wheel with multilingual TTS. Click any segment to hear its name pronounced in 10 languages via Gemini or Edge-TTS.
 
 ## Features
 
-- 24 color segments arranged in a spiked rosetta wheel (SVG)
+- 24 color segments arranged in a spiked SVG wheel
 - 10 languages: 🇨🇳 Chinese, 🇬🇧 English, 🇫🇷 French, 🇪🇸 Spanish, 🇷🇺 Russian, 🇬🇷 Greek, 🇮🇳 Hindi, 🇸🇦 Arabic, 🇯🇵 Japanese, 🇰🇷 Korean
 - Dual TTS engines: Google Gemini TTS & Microsoft Edge-TTS
 - MD5-hashed audio cache with automatic proxy fallback
@@ -38,6 +38,12 @@ npm run test:tts         # Smoke test all 10 languages
 npm run pre-cache        # Pre-cache all TTS audio (edge engine)
 BASE_URL=http://localhost:3100 npm run test:tts  # Custom port
 ```
+
+## Docs
+
+- [Cultural essay: Color Rosetta](docs/color-rosetta.md)
+- [Architecture flow](docs/ARCH_FLOW.md)
+- [Video generation guide](rosetta-video/README.md)
 
 ## Translations
 

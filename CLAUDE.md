@@ -2,68 +2,66 @@
 
 ## Project Overview
 
-Interactive 24-color wheel with multilingual TTS (Color Rosetta). Users click color segments to hear names in 10 languages (zh, en, fr, es, ru, el, hi, ar, ja, ko) via Gemini or Edge-TTS.
+Color Rosetta is an interactive 24-color wheel with multilingual TTS. Users click color segments to hear names in 10 languages (`zh`, `en`, `fr`, `es`, `ru`, `el`, `hi`, `ar`, `ja`, `ko`) via Gemini or Edge-TTS.
+
+## Working Rules
+
+- Keep `public/assets/js/data.js` as the only source of truth for colors, labels, and valid languages.
+- Do not duplicate frontend entry files or move server code out of `src/server`.
+- Preserve existing formatting conventions: backend uses 2 spaces, frontend/data uses 4.
+- Treat `.cache/` and `output/` as generated artifacts. Do not hand-edit them.
 
 ## Architecture
 
-1. **Frontend** (`public/index.html`, `public/assets/js/app.js`, `public/assets/css/style.css`)
-   - SVG color wheel with 24 spiked segments, language switcher, TTS engine selector
-   - Audio concurrency control (stops previous audio on new click)
-   - ARIA accessibility attributes on interactive elements
+1. **Frontend**
+   - `public/index.html`: static shell
+   - `public/assets/js/app.js`: SVG wheel, language and engine switching, audio playback, stale-request protection
+   - `public/assets/css/style.css`: visual system
+2. **Backend**
+   - `src/server/index.js`: static hosting, `/api/tts`, cache reads/writes, headers, WAV wrapping, rate limiting, graceful shutdown
+   - `src/server/tts-engines.js`: Gemini and Edge-TTS execution paths
+   - `src/server/utils.js`: cache-key and engine audio metadata helpers
+3. **Shared data**
+   - `public/assets/js/data.js`: 24-color dataset and language metadata used by UI, server validation, and scripts
+4. **Scripts**
+   - `scripts/test-all-languages.js`: smoke tests for `edge` and optional `gemini`
+   - `scripts/pre-cache-tts.js`: Edge cache warmup
 
-2. **Backend** (`src/server/index.js`)
-   - Express server, `/api/tts` endpoint, MD5-hashed `.cache/` system
-   - Auto proxy fallback on Edge-TTS 500 errors (port 7897)
-   - In-memory rate limiting (60 req/min per IP)
-   - Graceful shutdown on SIGTERM/SIGINT
+## Response Contract
 
-3. **TTS Engines** (`src/server/tts-engines.js`)
-   - **Gemini**: `@google/generative-ai` SDK, `gemini-3.1-flash-tts-preview`, cached client instances
-   - **Edge-TTS**: Python subprocess with retry logic and temp file cleanup
+- Successful `edge` responses return `audio/mpeg`.
+- Successful `gemini` responses return `audio/wav`.
+- Successful audio responses include `X-Cache` and `X-TTS-Engine`.
+- Error responses must remain JSON. Do not pre-set audio headers before success is known.
 
-4. **Shared** (`src/shared/color-data.js`)
-   - Canonical color data, language codes, and valid languages shared between frontend/backend/scripts
+## Frontend Constraints
 
-## Data Model
+- Rapid repeated clicks must not allow an earlier TTS response to play after a later selection.
+- If you change playback behavior, preserve both audio stop behavior and request cancellation or ignore-stale behavior.
+- Keep accessibility labels and keyboard interaction on wheel segments intact.
 
-`public/assets/js/data.js` — 24 color objects:
-```javascript
-{ angle: 0, hex: "#FF0000", zh: "红色", en: "Red", fr: "Rouge", ... }
-```
+## TTS Engine Notes
 
-## Cache
-
-- Key: `MD5(engine_lang_text)` → `.mp3` (Edge) / `.wav` (Gemini) in `.cache/`
-- Headers: `X-Cache: HIT/MISS`, `X-TTS-Engine: gemini/edge`
-- Tracked via Git LFS (`.gitattributes`)
+- **Gemini**: depends on `GEMINI_API_KEY` and may fail because of quota or regional restrictions. Failures should surface clearly and should not be disguised as audio responses.
+- **Edge-TTS**: depends on a Python runtime, defaults to `.venv-edge-tts/bin/python`, and may retry or fall back through `EDGE_TTS_PROXY`.
 
 ## Commands
 
 ```bash
-npm start                # Express server (default port 10010)
-npm run test:tts         # Smoke test all 10 languages
-BASE_URL=http://localhost:3100 npm run test:tts  # Custom port
-npm run pre-cache        # Pre-cache all TTS audio files (edge engine)
+npm install
+npm start
+PORT=10011 npm start
+BASE_URL=http://localhost:10011 npm run test:tts
+TTS_TEST_ENGINES=edge,gemini BASE_URL=http://localhost:10011 npm run test:tts
+npm run pre-cache
 ```
 
-## Scripts
+## Validation Checklist
 
-- `scripts/pre-cache-tts.js` — batch pre-caching TTS audio for all 24 colors × 10 languages
-- `scripts/test-all-languages.js` — smoke test for `/api/tts` endpoint
-
-## Video Generation
-
-Located in `rosetta-video/`. Uses Puppeteer for visual capture and FFmpeg for audio integration.
-- **Audio Constraint**: Puppeteer DOES NOT capture system/browser audio. Audio MUST be merged post-recording.
-- **Merge Process**:
-    1. Collect individual TTS audio files from `.cache/`.
-    2. Concat files using FFmpeg `concat` into a single track.
-    3. Merge the silent video and concat audio using FFmpeg with `-itsoffset` for synchronization.
-- **Resolution**: 1080x1920 (Portrait).
-
-## Environment Variables
-
-`.env`: `GEMINI_API_KEY`, `TTS_ENGINE` (edge/gemini), `PORT` (10010), `EDGE_TTS_PYTHON` (.venv-edge-tts/bin/python)
+- If port `10010` is already in use, start the app on another port and point tests at it.
+- For API changes, verify one normal browser click and one rapid-click path.
+- Treat smoke test failures as real failures; the script is expected to exit non-zero now.
+- A first-run `HIT` is acceptable if `.cache/` is already warm.
 
 ## Commit Identity
 

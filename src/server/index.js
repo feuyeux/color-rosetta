@@ -101,19 +101,16 @@ app.post('/api/tts', rateLimit, async (req, res) => {
     const styleParams = selectedEngine === 'edge' ? getVoiceStyle(lang) : null;
     const cacheKey = getCacheKey(text, lang, selectedEngine, styleParams);
 
-    // Set common headers
-    res.set('Content-Type', audioConfig.contentType);
-    res.set('X-TTS-Engine', selectedEngine);
-
     const cachedAudio = await getCache(cacheKey, selectedEngine);
     if (cachedAudio) {
       console.log(`✓ Cache HIT: ${cacheKey}`);
+      res.set('Content-Type', audioConfig.contentType);
+      res.set('X-TTS-Engine', selectedEngine);
       res.set('X-Cache', 'HIT');
       return res.send(cachedAudio);
     }
 
     console.log(`✗ Cache MISS: ${cacheKey}, requesting ${selectedEngine}...`);
-    res.set('X-Cache', 'MISS');
 
     let audioBuffer;
 
@@ -129,6 +126,9 @@ app.post('/api/tts', rateLimit, async (req, res) => {
         }
       }
     } else {
+      if (!process.env.GEMINI_API_KEY) {
+        return res.status(503).json({ error: 'Gemini API key not configured' });
+      }
       audioBuffer = await geminiTTS(text, lang, process.env.GEMINI_API_KEY);
     }
 
@@ -143,6 +143,9 @@ app.post('/api/tts', rateLimit, async (req, res) => {
     await setCache(cacheKey, wavBuffer, selectedEngine);
     console.log(`✓ Cached: ${cacheKey}`);
 
+    res.set('Content-Type', audioConfig.contentType);
+    res.set('X-TTS-Engine', selectedEngine);
+    res.set('X-Cache', 'MISS');
     res.send(wavBuffer);
   } catch (error) {
     console.error('TTS Error:', error);

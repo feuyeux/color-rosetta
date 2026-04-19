@@ -101,8 +101,8 @@ flowchart TD
 
 ### 2.1 表现层 (Presentation Layer)
 - **文件**: `public/assets/js/app.js`
-- **核心逻辑**: 负责 D3/SVG 色轮渲染与用户点击事件捕获。
-- **状态管理**: 维护 `audioCache` 内存缓存，确保同一会话内零延迟响应。
+- **核心逻辑**: 负责原生 DOM/SVG 色轮渲染与用户点击事件捕获。
+- **状态管理**: 维护 `audioCache` 内存缓存，确保同一会话内重复点击可直接复用已下载音频。
 
 ### 2.2 传输与安全层 (Transport & Security Layer)
 - **文件**: `src/server/index.js`
@@ -117,9 +117,9 @@ flowchart TD
 
 ### 2.4 引擎适配层 (Engine Adapter Layer)
 - **文件**: `src/server/tts-engines.js`
-- **核心逻辑**: 
+- **核心逻辑**:
   - 适配 Edge-TTS 与 Gemini TTS 接口。
-  - **网络冗灾**: 内置 7897 代理端口重试机制，确保全球范围内的高可用性。
+  - **失败回退**: Edge-TTS 在特定错误场景下可切换到 7897 代理端口重试。
 
 ### 2.5 视频自动化流水线 (Off-line Pipeline)
 - **核心逻辑**: 

@@ -5,10 +5,26 @@ let currentEngine = 'edge';
 let currentAudio = null;
 let isSpeaking = false;
 let selectedColorIndex = -1;
+let currentTtsRequestId = 0;
+let currentTtsController = null;
 // Client-side audio cache: "engine_lang_text" → Blob URL
 const audioCache = new Map();
 const svg = document.getElementById('colorWheel');
 const selectedColorDiv = document.getElementById('selectedColor');
+const ttsStatusEl = document.getElementById('ttsStatus');
+
+const WHEEL_ARIA_LABELS = {
+    zh: 'Color Rosetta 24 色轮',
+    en: 'Color Rosetta 24-color wheel',
+    fr: 'Color Rosetta roue de 24 couleurs',
+    es: 'Color Rosetta rueda de 24 colores',
+    ru: 'Color Rosetta: цветовой круг из 24 сегментов',
+    el: 'Color Rosetta τροχός 24 χρωμάτων',
+    hi: 'Color Rosetta 24-रंग चक्र',
+    ar: 'عجلة Color Rosetta ذات 24 لونا',
+    ja: 'Color Rosetta 24色ホイール',
+    ko: 'Color Rosetta 24색 휠'
+};
 
 function applyLanguagePresentation(lang) {
     document.body.dataset.lang = lang;
@@ -17,11 +33,18 @@ function applyLanguagePresentation(lang) {
     selectedColorDiv.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
 }
 
+function setTtsStatus(text, tone = 'neutral') {
+    if (!ttsStatusEl) return;
+    ttsStatusEl.textContent = text;
+    ttsStatusEl.dataset.tone = tone;
+    ttsStatusEl.style.opacity = '1';
+}
+
 function createColorWheel() {
     svg.innerHTML = '';
     svg.setAttribute('viewBox', '-500 -500 1000 1000');
     svg.setAttribute('role', 'group');
-    svg.setAttribute('aria-label', '24-Color Rosetta Disk');
+    svg.setAttribute('aria-label', WHEEL_ARIA_LABELS[currentLang] || WHEEL_ARIA_LABELS.en);
 
     const totalSegments = colorData.length;
     const segmentAngle = 360 / totalSegments;
@@ -175,7 +198,7 @@ function updateColorInfo(index, skipAnimation = false) {
     nameSpan.textContent = colorName;
 
     const infoSmall = document.createElement('small');
-    infoSmall.textContent = `${color.hex} — Rosetta Division ${index + 1}`;
+    infoSmall.textContent = `${color.hex} · ${index + 1}/${colorData.length}`;
 
     selectedColorDiv.textContent = '';
     selectedColorDiv.appendChild(nameSpan);
@@ -218,51 +241,64 @@ function handleColorClick(index) {
 
 function speakText(text, lang) {
     isSpeaking = true;
+    currentTtsRequestId += 1;
+    const requestId = currentTtsRequestId;
     const cacheId = `${currentEngine}_${lang}_${text}`;
+
+    if (currentTtsController) {
+        currentTtsController.abort();
+        currentTtsController = null;
+    }
 
     // Check client-side audio cache first
     if (audioCache.has(cacheId)) {
         console.log(`TTS: ${currentEngine} | Cache: LOCAL`);
-        const statusEl = document.getElementById('ttsStatus');
-        if (statusEl) {
-            statusEl.textContent = `✓ ${currentEngine} (LOCAL)`;
-            statusEl.style.color = '#4a7c59';
-        }
+        setTtsStatus(`${currentEngine} · local cache`, 'success');
         playAudioFromUrl(audioCache.get(cacheId), false);
         return;
     }
 
+    setTtsStatus(`${currentEngine} · requesting audio`, 'neutral');
+    currentTtsController = new AbortController();
+
     fetch('/api/tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, lang, engine: currentEngine })
+        body: JSON.stringify({ text, lang, engine: currentEngine }),
+        signal: currentTtsController.signal
     })
     .then(response => {
+        if (requestId !== currentTtsRequestId) {
+            throw new Error('Stale TTS response');
+        }
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         const cacheStatus = response.headers.get('X-Cache');
         const engine = response.headers.get('X-TTS-Engine');
         console.log(`TTS: ${engine} | Cache: ${cacheStatus}`);
-        const statusEl = document.getElementById('ttsStatus');
-        if (statusEl) {
-            statusEl.textContent = `✓ ${engine} (${cacheStatus})`;
-            statusEl.style.color = '#4a7c59';
-        }
+        setTtsStatus(`${engine} · ${cacheStatus.toLowerCase()} cache`, 'success');
         return response.blob();
     })
     .then(blob => {
+        if (requestId !== currentTtsRequestId) {
+            return;
+        }
         const objectUrl = URL.createObjectURL(blob);
         audioCache.set(cacheId, objectUrl);
         playAudioFromUrl(objectUrl, false);
     })
     .catch(error => {
+        if (error.name === 'AbortError' || error.message === 'Stale TTS response') {
+            return;
+        }
         console.error('TTS Error:', error);
         isSpeaking = false;
-        const statusEl = document.getElementById('ttsStatus');
-        if (statusEl) {
-            statusEl.textContent = `✗ Error: ${error.message}`;
-            statusEl.style.color = '#c44536';
+        setTtsStatus(`error · ${error.message}`, 'error');
+    })
+    .finally(() => {
+        if (requestId === currentTtsRequestId) {
+            currentTtsController = null;
         }
     });
 }
@@ -275,10 +311,7 @@ function playAudioFromUrl(objectUrl, revokeOnEnd) {
         if (revokeOnEnd) URL.revokeObjectURL(objectUrl);
         currentAudio = null;
         isSpeaking = false;
-        const statusEl = document.getElementById('ttsStatus');
-        if (statusEl) {
-            setTimeout(() => { statusEl.style.opacity = '0'; }, 500);
-        }
+        setTimeout(() => setTtsStatus(`ready · ${currentEngine}`, 'neutral'), 500);
     };
     audio.onerror = () => {
         if (revokeOnEnd) URL.revokeObjectURL(objectUrl);
@@ -335,6 +368,7 @@ document.querySelectorAll('.engine-btn').forEach(btn => {
         btn.classList.add('active');
         btn.setAttribute('aria-pressed', 'true');
         console.log(`Switched to ${currentEngine} TTS engine`);
+        setTtsStatus(`ready · ${currentEngine}`, 'neutral');
     });
 });
 
@@ -342,3 +376,4 @@ applyLanguagePresentation(currentLang);
 const defaultLangBtn = document.querySelector(`.lang-btn[data-lang="${currentLang}"]`);
 if (defaultLangBtn) applyBtnStyle(defaultLangBtn, ACTIVE_STYLE);
 createColorWheel();
+setTtsStatus(`ready · ${currentEngine}`, 'neutral');
