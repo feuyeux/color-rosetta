@@ -51,4 +51,12 @@ BASE_URL=http://localhost:3100 npm run test:tts  # Custom port
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=feuyeux/color-rosetta&type=Date)](https://star-history.com/#feuyeux/color-rosetta&Date)
+[![Repo size](https://img.shields.io/github/repo-size/feuyeux/color-rosetta)](https://github.com/feuyeux/color-rosetta)
+[![Last commit](https://img.shields.io/github/last-commit/feuyeux/color-rosetta)](https://github.com/feuyeux/color-rosetta/commits)
+[![Commit activity](https://img.shields.io/github/commit-activity/m/feuyeux/color-rosetta)](https://github.com/feuyeux/color-rosetta/graphs/commit-activity)
+[![Contributors](https://img.shields.io/github/contributors/feuyeux/color-rosetta)](https://github.com/feuyeux/color-rosetta/graphs/contributors)
+
+Star history: [star-history.com/#feuyeux/color-rosetta](https://star-history.com/#feuyeux/color-rosetta&Date).
+The live embed was removed because GitHub now restricts the stargazer timeline API
+to repository collaborators, so third-party star charts cannot render without an
+owner-supplied token ([details](https://www.star-history.com/blog/github-stargazer-api-restriction)).

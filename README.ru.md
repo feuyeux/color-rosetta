@@ -46,4 +46,9 @@ BASE_URL=http://localhost:3100 npm run test:tts  # Пользовательск�
 
 ## История звёзд
 
-[![Star History Chart](https://api.star-history.com/svg?repos=feuyeux/color-rosetta&type=Date)](https://star-history.com/#feuyeux/color-rosetta&Date)
+[![Repo size](https://img.shields.io/github/repo-size/feuyeux/color-rosetta)](https://github.com/feuyeux/color-rosetta)
+[![Last commit](https://img.shields.io/github/last-commit/feuyeux/color-rosetta)](https://github.com/feuyeux/color-rosetta/commits)
+[![Commit activity](https://img.shields.io/github/commit-activity/m/feuyeux/color-rosetta)](https://github.com/feuyeux/color-rosetta/graphs/commit-activity)
+[![Contributors](https://img.shields.io/github/contributors/feuyeux/color-rosetta)](https://github.com/feuyeux/color-rosetta/graphs/contributors)
+
+[Star History](https://star-history.com/#feuyeux/color-rosetta&Date)
